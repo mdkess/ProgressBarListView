@@ -9,3 +9,5 @@ The FileDownloadTask's Thread.sleep() on line 23 controls the pace of the task. 
 So the big question is: What is the proper way to accomplish having a ProgressBar smoothly update in a ListView, while not blocking touch events?
 
 See: http://stackoverflow.com/q/11200299/31455 for my original question.
+
+![Screenshot](https://github.com/mdkess/ProgressBarListView/raw/master/screenshot.png "ListView Screenshot")
