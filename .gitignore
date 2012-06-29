@@ -1,0 +1,7 @@
+*.com
+*.class
+
+.metadata
+.settings/
+bin/
+gen/
