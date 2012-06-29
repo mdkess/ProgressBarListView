@@ -10,4 +10,4 @@ So the big question is: What is the proper way to accomplish having a ProgressBa
 
 See: http://stackoverflow.com/q/11200299/31455 for my original question.
 
- ![Screenshot](/screenshot.png)
+ ![Screenshot](https://github.com/mdkess/ProgressBarListView/raw/master/screenshot.png)
