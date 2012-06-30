@@ -20,8 +20,8 @@ public class MainActivity extends Activity {
     ListView listView = (ListView) findViewById(R.id.downloadListView);
     
     List<DownloadInfo> downloadInfo = new ArrayList<DownloadInfo>();
-    for(int i = 0; i < 20; ++i) {
-      downloadInfo.add(new DownloadInfo("File " + i, 500));
+    for(int i = 0; i < 50; ++i) {
+      downloadInfo.add(new DownloadInfo("File " + i, 100));
     }
     
     listView.setAdapter(new DownloadInfoArrayAdapter(getApplicationContext(), R.id.downloadListView, downloadInfo));
