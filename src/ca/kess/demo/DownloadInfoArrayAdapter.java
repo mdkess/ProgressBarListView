@@ -3,7 +3,7 @@ package ca.kess.demo;
 import java.util.List;
 
 import android.content.Context;
-import android.util.Log;
+import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -16,15 +16,17 @@ import ca.kess.demo.DownloadInfo.DownloadState;
 import ca.kess.scrollbarlistview.R;
 
 public class DownloadInfoArrayAdapter extends ArrayAdapter<DownloadInfo> {
-  private static final String TAG = DownloadInfoArrayAdapter.class.getSimpleName();
-  private static class DownloadInfoHolder {
-    TextView filenameTextView;
-    ProgressBar downloadProgressBar;
-    Button downloadButton;
+  // Simple class to make it so that we don't have to call findViewById frequently
+  private static class ViewHolder {
+    TextView textView;
+    ProgressBar progressBar;
+    Button button;
     DownloadInfo info;
-    int lastPosition;
   }
   
+  
+  private static final String TAG = DownloadInfoArrayAdapter.class.getSimpleName();
+
   public DownloadInfoArrayAdapter(Context context, int textViewResourceId,
       List<DownloadInfo> objects) {
     super(context, textViewResourceId, objects);
@@ -32,60 +34,51 @@ public class DownloadInfoArrayAdapter extends ArrayAdapter<DownloadInfo> {
   
   @Override
   public View getView(int position, View convertView, ViewGroup parent) {
-    //Log.d(TAG, "Getting item at position " + position + " - convertView is "
-    //    + (convertView == null ? "NULL" : "NOT NULL"));
     View row = convertView;
     final DownloadInfo info = getItem(position);
+    // We need to set the convertView's progressBar to null.
 
+    ViewHolder holder = null;
+    
     if(null == row) {
       LayoutInflater inflater = (LayoutInflater)getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
       row = inflater.inflate(R.layout.file_download_row, parent, false);
-      Log.d(TAG, "Created new row for " + info.getFilename());
+      
+      holder = new ViewHolder();
+      holder.textView = (TextView) row.findViewById(R.id.downloadFileName);
+      holder.progressBar = (ProgressBar) row.findViewById(R.id.downloadProgressBar);
+      holder.button = (Button)row.findViewById(R.id.downloadButton);
+      holder.info = info;
+      
+      row.setTag(holder);
     } else {
-      DownloadInfo tmp = (DownloadInfo) row.getTag();
-      tmp.setProgressBar(null);
-      Log.d(TAG, "Setting progress bar on " + tmp.getFilename() +
-          " to null since it is being used by " + info.getFilename());
+      holder = (ViewHolder) row.getTag();
+      
+      holder.info.setProgressBar(null);
+      holder.info = info;
+      holder.info.setProgressBar(holder.progressBar);
     }
+
+    holder.textView.setText(info.getFilename());
+    holder.progressBar.setProgress(info.getProgress());
+    holder.progressBar.setMax(info.getFileSize());
+    info.setProgressBar(holder.progressBar);
     
-    row.setTag(info);
-    
-    final TextView textView = (TextView) row.findViewById(R.id.downloadFileName);
-    final ProgressBar progressBar = (ProgressBar) row.findViewById(R.id.downloadProgressBar);
-    final Button downloadButton = (Button)row.findViewById(R.id.downloadButton); 
-    
-    info.setProgressBar(progressBar);
-    textView.setText(info.getFilename());
-    //Now set up the button
-    switch(info.getDownloadState()) {
-    case NOT_STARTED:
-      downloadButton.setText("Download");
-      downloadButton.setEnabled(true);
-      break;
-    case ENQUEUED:
-      downloadButton.setText("Enqueued...");
-      downloadButton.setEnabled(false);
-      break;
-    case DOWNLOADING:
-      downloadButton.setText("Downloading...");
-      downloadButton.setEnabled(false);
-      break;
-    case COMPELETED:
-      downloadButton.setText("Done!");
-      downloadButton.setEnabled(false);
-      break;
-    }
-    
-    downloadButton.setOnClickListener(new OnClickListener() {
+    holder.button.setEnabled(info.getDownloadState() == DownloadState.NOT_STARTED);
+    final Button button = holder.button;
+    holder.button.setOnClickListener(new OnClickListener() {
+      @Override
       public void onClick(View v) {
-         Log.i(TAG, "Clicked " + info.getFilename());
-         info.setDownloadState(DownloadState.ENQUEUED);
-         downloadButton.setEnabled(false);
-         downloadButton.invalidate();
-         FileDownloadTask task = new FileDownloadTask(DownloadInfoArrayAdapter.this, info);
-         task.execute();
+        info.setDownloadState(DownloadState.QUEUED);
+        button.setEnabled(false);
+        button.invalidate();
+        FileDownloadTask task = new FileDownloadTask(info);
+        task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
       }
     });
+    
+    
+    //TODO: When reusing a view, invalidate the current progressBar.
     
     return row;
   }

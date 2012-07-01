@@ -3,13 +3,14 @@ package ca.kess.demo;
 import android.util.Log;
 import android.widget.ProgressBar;
 
+
 public class DownloadInfo {
   private final static String TAG = DownloadInfo.class.getSimpleName();
   public enum DownloadState {
     NOT_STARTED,
-    ENQUEUED,
+    QUEUED,
     DOWNLOADING,
-    COMPELETED
+    COMPLETE
   }
   private volatile DownloadState mDownloadState = DownloadState.NOT_STARTED;
   private final String mFilename;
@@ -24,19 +25,19 @@ public class DownloadInfo {
     mProgressBar = null;
   }
   
+  public ProgressBar getProgressBar() {
+    return mProgressBar;
+  }
+  public void setProgressBar(ProgressBar progressBar) {
+    Log.d(TAG, "setProgressBar " + mFilename + " to " + progressBar);
+    mProgressBar = progressBar;
+  }
+  
   public void setDownloadState(DownloadState state) {
     mDownloadState = state;
   }
   public DownloadState getDownloadState() {
     return mDownloadState;
-  }
-
-  public void setProgressBar(ProgressBar bar) {
-    Log.d(TAG, "Setting bar on " + mFilename + " to " + bar);
-    mProgressBar = bar;
-  }
-  public ProgressBar getProgressBar() {
-    return mProgressBar;
   }
   
   public Integer getProgress() {

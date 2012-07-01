@@ -1,3 +1,6 @@
+**SUCCESS: This behaves correctly now**
+
+
 My attempt to get smooth ProgressBars in ListViews. Unfortunately, I am unable to figure out how to do this.
 
 The idea is to have a ListView where each item is a ProgressBar and a Button. Clicking the Button causes an AsyncTask to execute, which notifies of its progress and updates the ProgressBar for the item in the ListView.
